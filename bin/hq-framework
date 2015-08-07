@@ -1,0 +1,6 @@
+#!/usr/bin/env python
+
+import hqframework.parser
+
+args = hqframework.parser.parser.parse_args()
+args.func(args)
