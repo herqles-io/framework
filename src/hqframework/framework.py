@@ -167,6 +167,8 @@ class AbstractFramework(Thread):
 
     def run(self):
         # TODO: can we reduce this time?
+        
+        # TODO: replace with Paxos https://github.com/cocagne/paxos
         while not self.event.wait(random.randint(5, 60)):
             try:
                 self.publish_jobs()
