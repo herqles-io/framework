@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='hq-framework',
-    version='2.0.0-dev',
+    version='1.0.0',
     url='https://github.com/herqles-io/hq-framework',
     include_package_data=True,
     license='MIT',
@@ -17,7 +17,7 @@ setup(
         'schematics==1.1.0'
     ],
     dependency_links=[
-        'git+https://github.com/herqles-io/hq-lib.git@2.0-dev#egg=hq-lib-2.0.0'
+        'git+https://github.com/herqles-io/hq-lib.git#egg=hq-lib-1.0.0'
     ],
     scripts=['bin/hq-framework']
 )
