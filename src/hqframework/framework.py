@@ -219,11 +219,6 @@ class AbstractFramework(Thread):
 
         self.registered()
 
-    def unix_time_millis(self, dt):
-        epoch = datetime.datetime.utcfromtimestamp(0).replace(tzinfo=dt.tzinfo)
-        delta = dt - epoch
-        return int(delta.total_seconds() * 1000.0)
-
     def tasks_have_status(self, job, status):
 
         for target in job.targets:
