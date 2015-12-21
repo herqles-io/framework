@@ -1,14 +1,20 @@
-import cherrypy
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+import json
 import os
 
+import cherrypy
+
+from hqframework.framework import FrameworkUtils
+from hqlib.config import parse_config
+from hqlib.config.base_config import BaseConfig
+from hqlib.config.error import HerqlesConfigError
+from hqlib.config.path_config import PathConfig
+from hqlib.config.rabbitmq_config import RabbitMQConfig
+from hqlib.config.sql_config import SQLConfig
+from hqlib.daemon import Daemon
 from hqlib.sql import SQLDB
 from hqlib.rabbitmq import RabbitMQ
-from hqframework.framework import FrameworkUtils
-from yaml import YAMLError
-from hqframework.config import parse_config, BaseConfig, RabbitMQConfig, PathConfig, SQLConfig
-from schematics.exceptions import ModelValidationError, ModelConversionError
-import json
-from hqlib.daemon import Daemon
 
 
 class FrameworkDaemon(Daemon):
@@ -24,60 +30,19 @@ class FrameworkDaemon(Daemon):
 
     def setup(self):
         try:
-            base_config = parse_config(self.args.config)
-        except YAMLError as e:
-            self.logger.error("Could not load worker config "+str(e))
-            return False
-        except IOError as e:
-            self.logger.error("Could not load worker config "+e.message)
-            return False
-
-        try:
-            base_config = BaseConfig(base_config, strict=False)
-        except ModelConversionError as e:
-            self.logger.error("Could not create base config " + json.dumps(e.message))
-            return False
-
-        try:
+            base_config_data = parse_config(self.args.config)
+            base_config = BaseConfig(base_config_data, strict=False)
             base_config.validate()
-        except ModelValidationError as e:
-            self.logger.error("Could not validate base config " + json.dumps(e.message))
-            return False
 
-        try:
             self.path_config = PathConfig(base_config.paths, strict=False)
-        except ModelConversionError as e:
-            self.logger.error("Could not create path config " + json.dumps(e.message))
-            return False
-
-        try:
             self.path_config.validate()
-        except ModelValidationError as e:
-            self.logger.error("Could not validate path config " + json.dumps(e.message))
-            return False
-
-        try:
             self.sql_config = SQLConfig(base_config.sql, strict=False)
-        except ModelConversionError as e:
-            self.logger.error("Could not create sql config " + json.dumps(e.message))
-            return False
-
-        try:
             self.sql_config.validate()
-        except ModelValidationError as e:
-            self.logger.error("Could not validate sql config " + json.dumps(e.message))
-            return False
-
-        try:
             self.rabbitmq_config = RabbitMQConfig(base_config.rabbitmq, strict=False)
-        except ModelConversionError as e:
-            self.logger.error("Could not create rabbitmq config " + json.dumps(e.message))
-            return False
-
-        try:
             self.rabbitmq_config.validate()
-        except ModelValidationError as e:
-            self.logger.error("Could not validate rabbitmq config " + json.dumps(e.message))
+
+        except HerqlesConfigError as hce:
+            self.logger.error(hce.message)
             return False
 
         return True
